@@ -1,0 +1,102 @@
+{% extends 'df_user/base_foot.html' %}
+{% block head %}
+    <script>
+    $(function () {
+        name_error=false
+        pwd_error=false
+        if($('.name_input').val().length!=0){
+            name_error = true
+        }
+        if($('.pwd_error').val().length!=0){
+            pwd_error = true
+        }
+
+
+        if({{ error_pwd }}== 0){
+            $('.pwd_error').html('登录信息错误').show()
+        }
+
+        $('.name_input').blur(function(){
+            check_name();
+        });
+
+        $('.pass_input').blur(function () {
+            check_pwd();
+        });
+
+        //检查用户名或手机号或邮箱是否符合规则
+        function check_name(){
+            var name = $('.name_input').val();
+            var re_name = /^\d*[a-zA-Z]+\d*$/;
+            var re_phone = /^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\d{8}$/;
+            var re_email = /^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$/;
+            if(!re_phone.test(name)&&!re_name.test(name)&&!re_email.test(name)){
+                $('.user_error').html('输入格式有误').show();
+                name_error=false;
+            }else {
+                $('.user_error').hide();
+                name_error=true;
+            }
+        }
+
+        //检查密码是否符合规则
+        function check_pwd(){
+            var pwd = $('.pass_input').val();
+            if(pwd.length<6||pwd.length>18){
+                $('.pwd_error').html('请输入6-18位的密码').show();
+                pwd_error=false
+            } else {
+                $('.pwd_error').hide();
+                pwd_error=true;
+            }
+        }
+
+
+        //为表单绑定提交事件
+        $("#form").submit(function(){
+            check_name();
+            check_pwd();
+            console.log(pwd_error,name_error);
+            if(pwd_error==false || name_error==false){
+                return false;//此处阻止提交表单
+            }
+            return true;
+        });
+
+    })
+    </script>
+{% endblock head %}
+{% block body %}
+<body>
+	<div class="login_top clearfix">
+		<a href="index.html" class="login_logo"><img src="/static/images/logo02.png"></a>
+	</div>
+
+	<div class="login_form_bg">
+		<div class="login_form_wrap clearfix">
+			<div class="login_banner fl"></div>
+			<div class="slogan fl">日夜兼程 · 急速送达</div>
+			<div class="login_form fr">
+				<div class="login_title clearfix">
+					<h1>用户登录</h1>
+					<a href="/user/register/">立即注册</a>
+				</div>
+				<div class="form_input">
+					<form id="form" action="/user/login_handle/" method="post">
+                        {% csrf_token %}
+						<input type="text" name="userlogin" class="name_input" value="{{ userlogin }}" placeholder="请输入用户名/手机号/邮箱">
+						<div class="user_error">输入错误</div>
+						<input type="password" name="pwd" class="pass_input" placeholder="请输入密码">
+						<div class="pwd_error">输入错误</div>
+						<div class="more_input clearfix">
+							<input type="checkbox" name="jizhu" value="1">
+							<label>记住用户名</label>
+							<a href="#">忘记密码</a>
+						</div>
+						<input id="lo" type="submit" name="" value="登录" class="input_submit">
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock body %}
